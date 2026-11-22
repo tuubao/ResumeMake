@@ -5,6 +5,7 @@ import ResumePreview from '@/components/ResumePreview.vue'
 import BasicsForm from '@/components/editor/BasicsForm.vue'
 import ModuleEditor from '@/components/editor/ModuleEditor.vue'
 import StylePanel from '@/components/editor/StylePanel.vue'
+import ExportMenu from '@/components/editor/ExportMenu.vue'
 import { TEMPLATES } from '@/templates'
 
 const store = useResumeStore()
@@ -12,10 +13,6 @@ const moduleTypes = Object.keys(MODULE_TYPE_LABELS) as ModuleType[]
 
 function resetSample() {
   if (window.confirm('确定重置为示例内容？当前内容将被覆盖。')) store.resetToSample()
-}
-
-function printPdf() {
-  window.print()
 }
 </script>
 
@@ -38,14 +35,7 @@ function printPdf() {
         <button type="button" class="rounded-lg px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100" @click="resetSample">
           重置示例
         </button>
-        <button
-          type="button"
-          data-testid="export-pdf"
-          class="rounded-lg bg-teal-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-teal-500"
-          @click="printPdf"
-        >
-          导出 PDF
-        </button>
+        <ExportMenu />
       </div>
     </header>
 
