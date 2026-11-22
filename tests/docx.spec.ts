@@ -68,4 +68,13 @@ describe('buildResumeDocx', () => {
     expect(xml).toContain('w:val="27"')
     expect(xml).toContain('强调')
   })
+
+  it('字段级字号覆盖写入 Word 文档', async () => {
+    const resume = createSampleResume()
+    resume.basics.styles = { name: { size: 40 } }
+    resume.modules[0].titleStyle = { size: 20 }
+    const xml = await docxXml(await buildResumeDocx(resume))
+    expect(xml).toContain('w:val="60"')
+    expect(xml).toContain('w:val="30"')
+  })
 })

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import type { ModuleItem, ModuleType } from '@/types/resume'
 import { useResumeStore } from '@/stores/resume'
 import RichText from './RichText.vue'
+import TextStyleControls from './TextStyleControls.vue'
 
 const props = defineProps<{ moduleId: string; item: ModuleItem; type: ModuleType }>()
 const store = useResumeStore()
@@ -34,10 +35,12 @@ function set(patch: Partial<ModuleItem>) {
       <label class="block text-xs text-slate-500">
         {{ labels.title }}
         <input :value="item.title" data-field="item-title" class="field" type="text" @input="set({ title: ($event.target as HTMLInputElement).value })" />
+        <TextStyleControls :model-value="item.titleStyle" @update:model-value="set({ titleStyle: $event })" />
       </label>
       <label class="block text-xs text-slate-500">
         {{ labels.subtitle }}
         <input :value="item.subtitle" data-field="item-subtitle" class="field" type="text" @input="set({ subtitle: ($event.target as HTMLInputElement).value })" />
+        <TextStyleControls :model-value="item.subtitleStyle" @update:model-value="set({ subtitleStyle: $event })" />
       </label>
       <label class="block text-xs text-slate-500">
         开始时间
@@ -46,6 +49,7 @@ function set(patch: Partial<ModuleItem>) {
       <label class="block text-xs text-slate-500">
         结束时间
         <input :value="item.endDate" data-field="item-end" class="field" type="text" placeholder="至今" @input="set({ endDate: ($event.target as HTMLInputElement).value })" />
+        <TextStyleControls :model-value="item.dateStyle" @update:model-value="set({ dateStyle: $event })" />
       </label>
       <label v-if="type === 'projects'" class="col-span-2 block text-xs text-slate-500">
         项目地址（选填）
@@ -57,6 +61,7 @@ function set(patch: Partial<ModuleItem>) {
           placeholder="如：https://github.com/you/project"
           @input="set({ link: ($event.target as HTMLInputElement).value })"
         />
+        <TextStyleControls :model-value="item.linkStyle" @update:model-value="set({ linkStyle: $event })" />
       </label>
     </div>
     <div class="mt-2">

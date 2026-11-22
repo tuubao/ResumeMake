@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import type { ResumeModule } from '@/types/resume'
 import { sanitizeHtml } from '@/utils/sanitize'
 import { HEADER_ICONS } from '@/utils/icons'
+import { textStyleCss } from '@/utils/textStyle'
 
 const props = defineProps<{
   module: ResumeModule
@@ -25,18 +26,18 @@ const safeHref = (url?: string) => {
     <h2
       v-if="variant === 'bar'"
       class="mb-2 border-l-4 pl-2 text-[1.1em] font-bold text-slate-900"
-      :style="{ borderColor: themeColor }"
+      :style="{ borderColor: themeColor, ...textStyleCss(module.titleStyle) }"
     >
       {{ module.title }}
     </h2>
     <h2
       v-else-if="variant === 'underline'"
       class="mb-2 border-b-2 pb-1 text-[1.1em] font-bold"
-      :style="{ borderColor: themeColor, color: themeColor }"
+      :style="{ borderColor: themeColor, color: themeColor, ...textStyleCss(module.titleStyle) }"
     >
       {{ module.title }}
     </h2>
-    <h2 v-else class="mb-2 border-b border-slate-300 pb-1 text-[1.1em] font-bold text-slate-900">
+    <h2 v-else class="mb-2 border-b border-slate-300 pb-1 text-[1.1em] font-bold text-slate-900" :style="textStyleCss(module.titleStyle)">
       {{ module.title }}
     </h2>
 
@@ -47,14 +48,18 @@ const safeHref = (url?: string) => {
       <article v-for="item in module.items" :key="item.id" class="resume-item">
         <header v-if="item.title || item.startDate" class="flex items-baseline justify-between gap-2">
           <div>
-            <span class="font-semibold">{{ item.title }}</span>
-            <span v-if="item.subtitle" class="ml-2 text-slate-600">{{ item.subtitle }}</span>
+            <span class="font-semibold" :style="textStyleCss(item.titleStyle)">{{ item.title }}</span>
+            <span v-if="item.subtitle" class="ml-2 text-slate-600" :style="textStyleCss(item.subtitleStyle)">{{ item.subtitle }}</span>
           </div>
-          <span v-if="item.startDate || item.endDate" class="shrink-0 text-[0.9em] text-slate-500">
+          <span
+            v-if="item.startDate || item.endDate"
+            class="shrink-0 text-[0.9em] text-slate-500"
+            :style="textStyleCss(item.dateStyle)"
+          >
             {{ item.startDate }}<template v-if="item.endDate"> - {{ item.endDate }}</template>
           </span>
         </header>
-        <p v-if="item.link" class="mt-0.5 flex items-center gap-1 text-[0.9em] text-slate-500">
+        <p v-if="item.link" class="mt-0.5 flex items-center gap-1 text-[0.9em] text-slate-500" :style="textStyleCss(item.linkStyle)">
           <svg
             class="h-[1em] w-[1em] shrink-0 text-slate-400"
             viewBox="0 0 24 24"

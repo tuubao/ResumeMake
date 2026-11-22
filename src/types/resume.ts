@@ -2,11 +2,18 @@ export type ModuleType = 'education' | 'skills' | 'work' | 'projects' | 'selfEva
 
 export type HeaderIcon = 'none' | 'phone' | 'mail' | 'briefcase' | 'at' | 'education' | 'location' | 'link' | 'user'
 
+/** 字段级字体覆盖：缺省继承全局/模板默认；bold=false 表示强制不加粗 */
+export interface TextStyle {
+  size?: number
+  bold?: boolean
+}
+
 /** 头部自定义信息行条目 */
 export interface CustomField {
   id: string
   icon: HeaderIcon
   value: string
+  style?: TextStyle
 }
 
 /** 通用条目：教育/工作/项目/自定义用 title+subtitle+日期，技能/自评仅用 content */
@@ -18,6 +25,11 @@ export interface ModuleItem {
   endDate?: string
   /** 项目地址（项目经历条目选填，http/https 链接） */
   link?: string
+  /** 字段级字体覆盖 */
+  titleStyle?: TextStyle
+  subtitleStyle?: TextStyle
+  dateStyle?: TextStyle
+  linkStyle?: TextStyle
   /** 富文本 HTML（仅加粗/列表等轻量标签） */
   content?: string
 }
@@ -26,6 +38,7 @@ export interface ResumeModule {
   id: string
   type: ModuleType
   title: string
+  titleStyle?: TextStyle
   items: ModuleItem[]
 }
 
@@ -39,6 +52,8 @@ export interface ResumeBasics {
   /** 一行补充信息：城市 / 工作年限等 */
   extra: string
   customFields: CustomField[]
+  /** 基本信息各字段字体覆盖，key: name/phone/email/jobTitle/extra */
+  styles?: Record<string, TextStyle>
 }
 
 export interface ResumeStyle {

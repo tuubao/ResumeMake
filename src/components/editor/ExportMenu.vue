@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { toJpeg } from 'html-to-image'
 import { useResumeStore } from '@/stores/resume'
 import { buildResumeDocx } from '@/utils/docx'
@@ -8,8 +8,25 @@ import { downloadBlob, downloadDataUrl } from '@/utils/download'
 const store = useResumeStore()
 const open = ref(false)
 const busy = ref(false)
+const root = ref<HTMLElement>()
 
 const baseName = () => (store.resume.basics.name || '简历') + '-简历'
+
+/** 点击菜单外部或按 Esc 关闭；不能用 mouseleave（按钮与菜单间的间隙会误触发） */
+function onDocClick(e: MouseEvent) {
+  if (open.value && root.value && !root.value.contains(e.target as Node)) open.value = false
+}
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') open.value = false
+}
+onMounted(() => {
+  document.addEventListener('click', onDocClick)
+  document.addEventListener('keydown', onKeydown)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocClick)
+  document.removeEventListener('keydown', onKeydown)
+})
 
 function exportPdf() {
   open.value = false
@@ -44,7 +61,7 @@ async function exportDocx() {
 </script>
 
 <template>
-  <div class="relative" @mouseleave="open = false">
+  <div ref="root" class="relative">
     <button
       type="button"
       data-testid="export-menu"

@@ -72,6 +72,32 @@ test('项目经历填写项目地址后出现在预览', async ({ page }) => {
   await expect(page.locator('main .resume-sheet a[href="https://github.com/test/campus-market"]')).toBeVisible()
 })
 
+test('导出菜单鼠标划过间隙不消失（回归）', async ({ page }) => {
+  await page.goto('/editor')
+  await page.getByTestId('export-menu').click()
+  const item = page.getByTestId('export-docx')
+  await expect(item).toBeVisible()
+  const btn = await page.getByTestId('export-menu').boundingBox()
+  const box = await item.boundingBox()
+  // 模拟真实鼠标：先经过按钮与菜单之间的间隙，再移入菜单项
+  await page.mouse.move(btn!.x + btn!.width / 2, btn!.y + btn!.height + 2, { steps: 4 })
+  await expect(item).toBeVisible()
+  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2, { steps: 4 })
+  await expect(item).toBeVisible()
+  const [dl] = await Promise.all([page.waitForEvent('download'), item.click()])
+  expect(dl.suggestedFilename()).toMatch(/\.docx$/)
+})
+
+test('字段级字号与加粗覆盖应用到预览', async ({ page }) => {
+  await page.goto('/editor')
+  const nameSelects = page.locator('label:has([data-field="name"]) select')
+  await nameSelects.nth(0).selectOption('36')
+  await nameSelects.nth(1).selectOption('0')
+  const h1 = page.locator('main .resume-sheet h1')
+  await expect(h1).toHaveCSS('font-size', '36px')
+  await expect(h1).toHaveCSS('font-weight', '400')
+})
+
 test('选中文字调字号与加粗应用到预览', async ({ page }) => {
   await page.goto('/editor')
   const editable = page.locator('.rich-input').first()

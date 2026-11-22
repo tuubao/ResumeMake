@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
-import type { CustomField, ModuleItem, ModuleType, Resume, ResumeBasics, ResumeModule, ResumeStyle } from '@/types/resume'
+import type { CustomField, ModuleItem, ModuleType, Resume, ResumeBasics, ResumeModule, ResumeStyle, TextStyle } from '@/types/resume'
 import { MODULE_TYPE_LABELS, createItem, uid } from '@/types/resume'
 import { createSampleResume } from '@/data/sampleResume'
 import { loadResume, saveResume } from '@/utils/storage'
@@ -30,6 +30,14 @@ export const useResumeStore = defineStore('resume', () => {
 
   function updateBasics(patch: Partial<ResumeBasics>) {
     Object.assign(resume.value.basics, patch)
+  }
+
+  /** 基本信息字段级字体覆盖；style 为空时移除覆盖 */
+  function updateBasicStyle(key: string, style?: TextStyle) {
+    const styles = { ...(resume.value.basics.styles ?? {}) }
+    if (style) styles[key] = style
+    else delete styles[key]
+    resume.value.basics.styles = styles
   }
 
   function updateStyle(patch: Partial<ResumeStyle>) {
@@ -84,6 +92,7 @@ export const useResumeStore = defineStore('resume', () => {
     resume,
     setTemplate,
     updateBasics,
+    updateBasicStyle,
     updateStyle,
     addModule,
     removeModule,

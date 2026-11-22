@@ -69,6 +69,20 @@ describe('模板渲染', () => {
     expect(wrapper.text()).toContain('张三')
   })
 
+  it('字段级字号与加粗覆盖渲染到头部与模块', () => {
+    const resume = createSampleResume()
+    resume.basics.styles = { name: { size: 36, bold: false } }
+    resume.modules[0].titleStyle = { size: 20 }
+    resume.modules[0].items[0].subtitleStyle = { bold: true }
+    const wrapper = mount(getTemplate('classic').component, { props: { resume } })
+    const h1 = wrapper.find('h1')
+    expect(h1.attributes('style')).toContain('font-size: 36px')
+    expect(h1.attributes('style')).toContain('font-weight: 400')
+    expect(wrapper.find('.resume-module h2').attributes('style')).toContain('font-size: 20px')
+    const subtitle = wrapper.findAll('.resume-item header span')[1]
+    expect(subtitle.attributes('style')).toContain('font-weight: 700')
+  })
+
   it('项目地址渲染为链接行；未填写不占位；危险协议不生成 href', () => {
     const resume = createSampleResume()
     const proj = resume.modules.find((m) => m.type === 'projects')!

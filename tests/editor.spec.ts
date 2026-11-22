@@ -2,12 +2,15 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import { nextTick } from 'vue'
+import type { TextStyle } from '@/types/resume'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import RichText from '@/components/editor/RichText.vue'
 import BasicsForm from '@/components/editor/BasicsForm.vue'
 import StylePanel from '@/components/editor/StylePanel.vue'
 import ModuleEditor from '@/components/editor/ModuleEditor.vue'
 import ItemEditor from '@/components/editor/ItemEditor.vue'
+import TextStyleControls from '@/components/editor/TextStyleControls.vue'
+import ExportMenu from '@/components/editor/ExportMenu.vue'
 import EditorView from '@/views/EditorView.vue'
 import { useResumeStore } from '@/stores/resume'
 
@@ -38,6 +41,59 @@ describe('RichText', () => {
     expect(select.exists()).toBe(true)
     expect(select.findAll('option').length).toBeGreaterThanOrEqual(8)
     expect(wrapper.find('button[title="加粗（选中文字）"]').exists()).toBe(true)
+  })
+})
+
+describe('TextStyleControls / 字段级样式', () => {
+  it('字号与加粗选择合并为覆盖对象，全默认时清空', async () => {
+    const wrapper = mount(TextStyleControls, { props: { modelValue: undefined } })
+    const selects = wrapper.findAll('select')
+    const last = () => wrapper.emitted('update:modelValue')!.at(-1)![0] as TextStyle | undefined
+    await selects[0].setValue('20')
+    expect(last()).toEqual({ size: 20 })
+    await wrapper.setProps({ modelValue: last() })
+    await selects[1].setValue('1')
+    expect(last()).toEqual({ size: 20, bold: true })
+    await wrapper.setProps({ modelValue: last() })
+    await selects[0].setValue('')
+    expect(last()).toEqual({ bold: true })
+    await wrapper.setProps({ modelValue: last() })
+    await selects[1].setValue('')
+    expect(last()).toBeUndefined()
+  })
+
+  it('基本信息姓名字体覆盖同步 store', async () => {
+    const store = useResumeStore()
+    const wrapper = mount(BasicsForm)
+    const selects = wrapper.findAll('select')
+    await selects[0].setValue('32')
+    await selects[1].setValue('0')
+    expect(store.resume.basics.styles?.name).toEqual({ size: 32, bold: false })
+    await selects[0].setValue('')
+    await selects[1].setValue('')
+    expect(store.resume.basics.styles?.name).toBeUndefined()
+  })
+
+  it('条目标题字体覆盖同步 store', async () => {
+    const store = useResumeStore()
+    const edu = store.resume.modules.find((m) => m.type === 'education')!
+    const wrapper = mount(ItemEditor, { props: { moduleId: edu.id, item: edu.items[0], type: edu.type } })
+    await wrapper.findAll('[data-testid="field-size"]')[0].setValue('24')
+    expect(edu.items[0].titleStyle).toEqual({ size: 24 })
+  })
+})
+
+describe('ExportMenu', () => {
+  it('点击外部关闭、菜单内点击不关闭', async () => {
+    const wrapper = mount(ExportMenu, { attachTo: document.body })
+    await wrapper.find('[data-testid="export-menu"]').trigger('click')
+    expect(wrapper.find('[data-testid="export-pdf"]').exists()).toBe(true)
+    await wrapper.find('div.absolute').trigger('click')
+    expect(wrapper.find('[data-testid="export-pdf"]').exists()).toBe(true)
+    document.body.click()
+    await nextTick()
+    expect(wrapper.find('[data-testid="export-pdf"]').exists()).toBe(false)
+    wrapper.unmount()
   })
 })
 

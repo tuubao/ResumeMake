@@ -2,6 +2,7 @@
 import type { ResumeModule } from '@/types/resume'
 import { useResumeStore } from '@/stores/resume'
 import ItemEditor from './ItemEditor.vue'
+import TextStyleControls from './TextStyleControls.vue'
 
 defineProps<{ module: ResumeModule }>()
 const store = useResumeStore()
@@ -9,13 +10,16 @@ const store = useResumeStore()
 
 <template>
   <section class="rounded-xl border border-slate-200 bg-white p-4">
-    <div class="mb-3 flex items-center justify-between gap-2">
-      <input
-        v-model="module.title"
-        data-field="module-title"
-        class="w-full rounded-lg border border-transparent px-2 py-1 text-sm font-bold text-slate-900 hover:border-slate-200 focus:border-teal-400 focus:outline-none"
-        type="text"
-      />
+    <div class="mb-3 flex items-start justify-between gap-2">
+      <div class="w-full">
+        <input
+          v-model="module.title"
+          data-field="module-title"
+          class="w-full rounded-lg border border-transparent px-2 py-1 text-sm font-bold text-slate-900 hover:border-slate-200 focus:border-teal-400 focus:outline-none"
+          type="text"
+        />
+        <TextStyleControls :model-value="module.titleStyle" @update:model-value="store.updateModule(module.id, { titleStyle: $event })" />
+      </div>
       <button
         type="button"
         data-testid="remove-module"

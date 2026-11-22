@@ -3,6 +3,7 @@ import { useResumeStore } from '@/stores/resume'
 import { fileToAvatarDataUrl } from '@/utils/image'
 import { ICON_OPTIONS } from '@/utils/icons'
 import type { HeaderIcon } from '@/types/resume'
+import TextStyleControls from './TextStyleControls.vue'
 
 const store = useResumeStore()
 
@@ -26,22 +27,27 @@ async function onAvatarChange(e: Event) {
       <label class="block text-xs text-slate-500">
         姓名
         <input v-model="store.resume.basics.name" data-field="name" class="field" type="text" />
+        <TextStyleControls :model-value="store.resume.basics.styles?.name" @update:model-value="store.updateBasicStyle('name', $event)" />
       </label>
       <label class="block text-xs text-slate-500">
         求职岗位
         <input v-model="store.resume.basics.jobTitle" data-field="jobTitle" class="field" type="text" />
+        <TextStyleControls :model-value="store.resume.basics.styles?.jobTitle" @update:model-value="store.updateBasicStyle('jobTitle', $event)" />
       </label>
       <label class="block text-xs text-slate-500">
         电话
         <input v-model="store.resume.basics.phone" data-field="phone" class="field" type="text" />
+        <TextStyleControls :model-value="store.resume.basics.styles?.phone" @update:model-value="store.updateBasicStyle('phone', $event)" />
       </label>
       <label class="block text-xs text-slate-500">
         邮箱
         <input v-model="store.resume.basics.email" data-field="email" class="field" type="text" />
+        <TextStyleControls :model-value="store.resume.basics.styles?.email" @update:model-value="store.updateBasicStyle('email', $event)" />
       </label>
       <label class="col-span-2 block text-xs text-slate-500">
         补充信息（城市 / 工作年限等）
         <input v-model="store.resume.basics.extra" data-field="extra" class="field" type="text" />
+        <TextStyleControls :model-value="store.resume.basics.styles?.extra" @update:model-value="store.updateBasicStyle('extra', $event)" />
       </label>
     </div>
     <div class="mt-3 flex items-center gap-3">
@@ -67,31 +73,34 @@ async function onAvatarChange(e: Event) {
 
     <div class="mt-3 space-y-2 border-t border-slate-100 pt-3">
       <p class="text-xs text-slate-500">自定义信息（显示在姓名下方信息行）</p>
-      <div v-for="f in store.resume.basics.customFields" :key="f.id" class="flex items-center gap-2">
-        <select
-          :value="f.icon"
-          data-field="custom-icon"
-          class="w-20 shrink-0 rounded-lg border border-slate-200 bg-white px-1.5 py-1.5 text-xs text-slate-700 outline-none focus:border-teal-400"
-          @change="store.updateCustomField(f.id, { icon: ($event.target as HTMLSelectElement).value as HeaderIcon })"
-        >
-          <option v-for="opt in ICON_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
-        <input
-          :value="f.value"
-          data-field="custom-value"
-          class="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-800 outline-none focus:border-teal-400"
-          type="text"
-          placeholder="如：某某大学（本科-2026.6 毕业）"
-          @input="store.updateCustomField(f.id, { value: ($event.target as HTMLInputElement).value })"
-        />
-        <button
-          type="button"
-          data-testid="remove-custom-field"
-          class="shrink-0 text-xs text-slate-400 hover:text-rose-500"
-          @click="store.removeCustomField(f.id)"
-        >
-          删除
-        </button>
+      <div v-for="f in store.resume.basics.customFields" :key="f.id" class="space-y-1">
+        <div class="flex items-center gap-2">
+          <select
+            :value="f.icon"
+            data-field="custom-icon"
+            class="w-20 shrink-0 rounded-lg border border-slate-200 bg-white px-1.5 py-1.5 text-xs text-slate-700 outline-none focus:border-teal-400"
+            @change="store.updateCustomField(f.id, { icon: ($event.target as HTMLSelectElement).value as HeaderIcon })"
+          >
+            <option v-for="opt in ICON_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+          </select>
+          <input
+            :value="f.value"
+            data-field="custom-value"
+            class="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-800 outline-none focus:border-teal-400"
+            type="text"
+            placeholder="如：某某大学（本科-2026.6 毕业）"
+            @input="store.updateCustomField(f.id, { value: ($event.target as HTMLInputElement).value })"
+          />
+          <button
+            type="button"
+            data-testid="remove-custom-field"
+            class="shrink-0 text-xs text-slate-400 hover:text-rose-500"
+            @click="store.removeCustomField(f.id)"
+          >
+            删除
+          </button>
+        </div>
+        <TextStyleControls :model-value="f.style" @update:model-value="store.updateCustomField(f.id, { style: $event })" />
       </div>
       <button
         type="button"
