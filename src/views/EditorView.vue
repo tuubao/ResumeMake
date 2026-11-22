@@ -13,6 +13,10 @@ const moduleTypes = Object.keys(MODULE_TYPE_LABELS) as ModuleType[]
 function resetSample() {
   if (window.confirm('确定重置为示例内容？当前内容将被覆盖。')) store.resetToSample()
 }
+
+function printPdf() {
+  window.print()
+}
 </script>
 
 <template>
@@ -33,6 +37,14 @@ function resetSample() {
         </select>
         <button type="button" class="rounded-lg px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100" @click="resetSample">
           重置示例
+        </button>
+        <button
+          type="button"
+          data-testid="export-pdf"
+          class="rounded-lg bg-teal-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-teal-500"
+          @click="printPdf"
+        >
+          导出 PDF
         </button>
       </div>
     </header>

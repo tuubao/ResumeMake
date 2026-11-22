@@ -44,3 +44,29 @@ body {
 .resume-sheet .resume-module h2 {
   break-inside: avoid;
 }
+
+/* PDF 导出：浏览器打印，仅输出打印根节点 */
+@page {
+  size: A4;
+  margin: 0;
+}
+@media print {
+  body {
+    background: #fff;
+  }
+  #app-main {
+    display: none !important;
+  }
+  #print-root {
+    display: block !important;
+  }
+  #print-root .resume-sheet {
+    width: 210mm !important;
+    min-height: auto;
+    box-shadow: none;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
