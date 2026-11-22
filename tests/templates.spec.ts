@@ -68,4 +68,23 @@ describe('模板渲染', () => {
     expect(wrapper.attributes('style')).toContain('padding: 20mm')
     expect(wrapper.text()).toContain('张三')
   })
+
+  it('项目地址渲染为链接行；未填写不占位；危险协议不生成 href', () => {
+    const resume = createSampleResume()
+    const proj = resume.modules.find((m) => m.type === 'projects')!
+    const bare = mount(getTemplate('classic').component, { props: { resume } })
+    expect(bare.text()).not.toContain('项目地址')
+
+    proj.items[0].link = 'https://github.com/zhangsan/campus-market'
+    const wrapper = mount(getTemplate('modern').component, { props: { resume } })
+    expect(wrapper.text()).toContain('项目地址：')
+    const a = wrapper.find('a[href="https://github.com/zhangsan/campus-market"]')
+    expect(a.exists()).toBe(true)
+    expect(a.text()).toBe('https://github.com/zhangsan/campus-market')
+
+    proj.items[0].link = 'javascript:alert(1)'
+    const evil = mount(getTemplate('classic').component, { props: { resume } })
+    expect(evil.find('a').exists()).toBe(false)
+    expect(evil.text()).toContain('javascript:alert(1)')
+  })
 })

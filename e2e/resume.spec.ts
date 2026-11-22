@@ -64,3 +64,10 @@ test('自定义信息与自定义模块出现在预览', async ({ page }) => {
   await page.getByTestId('add-module').last().click()
   await expect(page.locator('main .resume-sheet')).toContainText('自定义模块')
 })
+
+test('项目经历填写项目地址后出现在预览', async ({ page }) => {
+  await page.goto('/editor')
+  await page.locator('[data-field="item-link"]').first().fill('https://github.com/test/campus-market')
+  await expect(page.locator('main .resume-sheet')).toContainText('项目地址：')
+  await expect(page.locator('main .resume-sheet a[href="https://github.com/test/campus-market"]')).toBeVisible()
+})

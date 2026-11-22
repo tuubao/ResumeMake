@@ -48,4 +48,13 @@ describe('storage 持久化', () => {
     expect(loaded.basics.customFields).toEqual([])
     expect(loaded.style.nameSize).toBe(26)
   })
+
+  it('项目地址随存档保存与恢复', () => {
+    const resume = createSampleResume()
+    const proj = resume.modules.find((m) => m.type === 'projects')!
+    proj.items[0].link = 'https://github.com/zhangsan/campus-market'
+    saveResume(resume)
+    const loaded = loadResume()!
+    expect(loaded.modules.find((m) => m.type === 'projects')!.items[0].link).toBe('https://github.com/zhangsan/campus-market')
+  })
 })

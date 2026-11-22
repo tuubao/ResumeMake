@@ -174,6 +174,9 @@ export async function buildResumeDocx(resume: Resume): Promise<Blob> {
           })
         )
       }
+      if (item.link) {
+        children.push(para([run('项目地址：', { color: '475569' }), run(item.link, { color: theme })], { after: 40 }))
+      }
       for (const b of htmlToDocxBlocks(item.content ?? '')) {
         children.push(para(b.runs.map((r) => run(r.text, { bold: r.bold })), { bullet: b.bullet || isList, after: 40 }))
       }

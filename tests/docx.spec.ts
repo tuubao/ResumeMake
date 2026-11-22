@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { unzipSync, strFromU8 } from 'fflate'
 import { htmlToDocxBlocks, buildResumeDocx } from '@/utils/docx'
 import { createSampleResume } from '@/data/sampleResume'
 
@@ -31,5 +32,23 @@ describe('buildResumeDocx', () => {
   it('生成非空 docx Blob', async () => {
     const blob = await buildResumeDocx(createSampleResume())
     expect(blob.size).toBeGreaterThan(1000)
+  })
+
+  it('项目地址写入 Word 文档', async () => {
+    const resume = createSampleResume()
+    const proj = resume.modules.find((m) => m.type === 'projects')!
+    proj.items[0].link = 'https://github.com/zhangsan/campus-market'
+    const blob = await buildResumeDocx(resume)
+    // jsdom 的 Blob 无 arrayBuffer()，用 FileReader 读取
+    const buf = await new Promise<ArrayBuffer>((resolve, reject) => {
+      const fr = new FileReader()
+      fr.onload = () => resolve(fr.result as ArrayBuffer)
+      fr.onerror = () => reject(fr.error)
+      fr.readAsArrayBuffer(blob)
+    })
+    const files = unzipSync(new Uint8Array(buf))
+    const xml = strFromU8(files['word/document.xml'])
+    expect(xml).toContain('项目地址：')
+    expect(xml).toContain('https://github.com/zhangsan/campus-market')
   })
 })

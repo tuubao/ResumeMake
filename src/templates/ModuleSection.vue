@@ -11,6 +11,12 @@ const props = defineProps<{
 
 const isList = computed(() => props.module.type === 'skills')
 const clean = (html?: string) => sanitizeHtml(html ?? '')
+
+/** 仅 http/https 链接生成可点击 href，其余按纯文本展示 */
+const safeHref = (url?: string) => {
+  const u = (url ?? '').trim()
+  return /^https?:\/\//i.test(u) ? u : ''
+}
 </script>
 
 <template>
@@ -47,6 +53,18 @@ const clean = (html?: string) => sanitizeHtml(html ?? '')
             {{ item.startDate }}<template v-if="item.endDate"> - {{ item.endDate }}</template>
           </span>
         </header>
+        <p v-if="item.link" class="mt-0.5 text-[0.9em] text-slate-500">
+          项目地址：
+          <a
+            v-if="safeHref(item.link)"
+            :href="safeHref(item.link)"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="break-all underline"
+            :style="{ color: themeColor }"
+          >{{ item.link }}</a>
+          <span v-else class="break-all">{{ item.link }}</span>
+        </p>
         <div v-if="item.content" class="resume-content mt-1" v-html="clean(item.content)"></div>
       </article>
     </div>

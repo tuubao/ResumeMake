@@ -16,3 +16,5 @@
 - 头部为共享组件 `src/components/ResumeHeader.vue`（图标信息行 + 头像留空），三套模板共用
 - 导出：PDF 走打印专用根节点 + print CSS（`@page` A4）；JPG 用 html-to-image 抓取 `main .resume-sheet`；Word 用 docx 库（`src/utils/docx.ts`），不引入 html2canvas
 - 安装新依赖后若 E2E 出现懒加载路由跳转失败，先重启 dev server（Vite 依赖预构建缓存过期）
+- 本机 E2E 可能在测试全部通过后卡在退出阶段（Playwright 杀不掉自启的 vite，管道被占导致看不到输出）：先后台预启动 `npm run dev` 再跑 `npx playwright test`（reuseExistingServer 会复用），输出重定向到文件查看
+- 本机 `git` 不在 PATH，用完整路径 `C:\Users\admin\AppData\Local\Programs\MinGit\cmd\git.exe`

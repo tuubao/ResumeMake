@@ -16,6 +16,8 @@ export interface ModuleItem {
   subtitle?: string
   startDate?: string
   endDate?: string
+  /** 项目地址（项目经历条目选填，http/https 链接） */
+  link?: string
   /** 富文本 HTML（仅加粗/列表等轻量标签） */
   content?: string
 }

@@ -47,6 +47,17 @@ function set(patch: Partial<ModuleItem>) {
         结束时间
         <input :value="item.endDate" data-field="item-end" class="field" type="text" placeholder="至今" @input="set({ endDate: ($event.target as HTMLInputElement).value })" />
       </label>
+      <label v-if="type === 'projects'" class="col-span-2 block text-xs text-slate-500">
+        项目地址（选填）
+        <input
+          :value="item.link ?? ''"
+          data-field="item-link"
+          class="field"
+          type="text"
+          placeholder="如：https://github.com/you/project"
+          @input="set({ link: ($event.target as HTMLInputElement).value })"
+        />
+      </label>
     </div>
     <div class="mt-2">
       <RichText :model-value="item.content ?? ''" :placeholder="labels.content" @update:model-value="set({ content: $event })" />

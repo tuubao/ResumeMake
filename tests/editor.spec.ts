@@ -110,6 +110,18 @@ describe('ModuleEditor / ItemEditor', () => {
     expect(wrapper.text()).toContain('标题')
     expect(wrapper.find('[data-field="item-title"]').exists()).toBe(true)
   })
+
+  it('项目经历条目显示项目地址输入并同步 store，其他类型不显示', async () => {
+    const store = useResumeStore()
+    const proj = store.resume.modules.find((m) => m.type === 'projects')!
+    const wrapper = mount(ItemEditor, { props: { moduleId: proj.id, item: proj.items[0], type: proj.type } })
+    expect(wrapper.text()).toContain('项目地址')
+    await wrapper.find('[data-field="item-link"]').setValue('https://github.com/zhangsan/campus-market')
+    expect(proj.items[0].link).toBe('https://github.com/zhangsan/campus-market')
+    const edu = store.resume.modules.find((m) => m.type === 'education')!
+    const eduWrapper = mount(ItemEditor, { props: { moduleId: edu.id, item: edu.items[0], type: edu.type } })
+    expect(eduWrapper.find('[data-field="item-link"]').exists()).toBe(false)
+  })
 })
 
 describe('EditorView 集成', () => {
