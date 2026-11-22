@@ -31,6 +31,14 @@ describe('RichText', () => {
     await wrapper.setProps({ modelValue: '<b>b</b>' })
     expect(wrapper.find('[contenteditable]').element.innerHTML).toBe('<b>b</b>')
   })
+
+  it('工具栏提供逐字字号下拉与加粗按钮', () => {
+    const wrapper = mount(RichText, { props: { modelValue: '' } })
+    const select = wrapper.find('[data-testid="rich-size"]')
+    expect(select.exists()).toBe(true)
+    expect(select.findAll('option').length).toBeGreaterThanOrEqual(8)
+    expect(wrapper.find('button[title="加粗（选中文字）"]').exists()).toBe(true)
+  })
 })
 
 describe('BasicsForm', () => {

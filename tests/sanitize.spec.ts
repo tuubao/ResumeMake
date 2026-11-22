@@ -22,4 +22,10 @@ describe('sanitizeHtml', () => {
   it('剔除 iframe', () => {
     expect(sanitizeHtml('<iframe src="https://evil"></iframe><p>ok</p>')).toBe('<p>ok</p>')
   })
+
+  it('保留字号 style，剔除危险 style', () => {
+    expect(sanitizeHtml('<span style="font-size: 18px;">x</span>')).toBe('<span style="font-size: 18px;">x</span>')
+    expect(sanitizeHtml('<span style="background: url(javascript:alert(1))">x</span>')).not.toContain('style=')
+    expect(sanitizeHtml('<span style="width: expression(alert(1))">x</span>')).not.toContain('style=')
+  })
 })

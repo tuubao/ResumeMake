@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { ResumeModule } from '@/types/resume'
 import { sanitizeHtml } from '@/utils/sanitize'
+import { HEADER_ICONS } from '@/utils/icons'
 
 const props = defineProps<{
   module: ResumeModule
@@ -53,17 +54,26 @@ const safeHref = (url?: string) => {
             {{ item.startDate }}<template v-if="item.endDate"> - {{ item.endDate }}</template>
           </span>
         </header>
-        <p v-if="item.link" class="mt-0.5 text-[0.9em] text-slate-500">
-          项目地址：
+        <p v-if="item.link" class="mt-0.5 flex items-center gap-1 text-[0.9em] text-slate-500">
+          <svg
+            class="h-[1em] w-[1em] shrink-0 text-slate-400"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            v-html="HEADER_ICONS.link"
+          ></svg>
+          <span class="shrink-0">项目地址：</span>
           <a
             v-if="safeHref(item.link)"
             :href="safeHref(item.link)"
             target="_blank"
             rel="noopener noreferrer"
-            class="break-all underline"
-            :style="{ color: themeColor }"
+            class="break-all text-slate-600 hover:underline"
           >{{ item.link }}</a>
-          <span v-else class="break-all">{{ item.link }}</span>
+          <span v-else class="break-all text-slate-600">{{ item.link }}</span>
         </p>
         <div v-if="item.content" class="resume-content mt-1" v-html="clean(item.content)"></div>
       </article>

@@ -18,6 +18,8 @@ import { sanitizeHtml } from './sanitize'
 export interface DocxRun {
   text: string
   bold?: boolean
+  /** 字号（半磅），缺省跟随正文 */
+  size?: number
 }
 export interface DocxBlock {
   runs: DocxRun[]
@@ -34,21 +36,28 @@ export function htmlToDocxBlocks(html: string): DocxBlock[] {
     if (pending.some((r) => r.text.trim())) blocks.push({ runs: pending })
     pending = []
   }
-  const collect = (node: Node, bold: boolean, out: DocxRun[]) => {
+  const collect = (node: Node, bold: boolean, out: DocxRun[], size?: number) => {
     if (node.nodeType === 3) {
       const t = node.textContent ?? ''
-      if (t) out.push({ text: t, bold: bold || undefined })
+      if (t) out.push({ text: t, bold: bold || undefined, size })
       return
     }
     if (node.nodeType !== 1) return
     const el = node as HTMLElement
     const tag = el.tagName.toLowerCase()
     if (tag === 'br') {
-      out.push({ text: '\n' })
+      out.push({ text: '\n', size })
       return
     }
-    const b = bold || tag === 'b' || tag === 'strong'
-    el.childNodes.forEach((c) => collect(c, b, out))
+    const fw = el.style?.fontWeight ?? ''
+    const b = bold || tag === 'b' || tag === 'strong' || fw === 'bold' || Number(fw) >= 600
+    let s = size
+    const fs = el.style?.fontSize ?? ''
+    if (fs.endsWith('px')) {
+      const n = parseFloat(fs)
+      if (!Number.isNaN(n)) s = Math.round(n * 1.5)
+    }
+    el.childNodes.forEach((c) => collect(c, b, out, s))
   }
   const pushRuns = (runs: DocxRun[], bullet: boolean) => {
     if (runs.some((r) => r.text.trim())) blocks.push({ runs, bullet: bullet || undefined })
@@ -175,10 +184,10 @@ export async function buildResumeDocx(resume: Resume): Promise<Blob> {
         )
       }
       if (item.link) {
-        children.push(para([run('项目地址：', { color: '475569' }), run(item.link, { color: theme })], { after: 40 }))
+        children.push(para([run('项目地址：', { color: '64748b' }), run(item.link, { color: '475569' })], { after: 40 }))
       }
       for (const b of htmlToDocxBlocks(item.content ?? '')) {
-        children.push(para(b.runs.map((r) => run(r.text, { bold: r.bold })), { bullet: b.bullet || isList, after: 40 }))
+        children.push(para(b.runs.map((r) => run(r.text, { bold: r.bold, size: r.size })), { bullet: b.bullet || isList, after: 40 }))
       }
     }
   }

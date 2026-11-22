@@ -81,6 +81,9 @@ describe('模板渲染', () => {
     const a = wrapper.find('a[href="https://github.com/zhangsan/campus-market"]')
     expect(a.exists()).toBe(true)
     expect(a.text()).toBe('https://github.com/zhangsan/campus-market')
+    // 与全局元信息同级：灰阶、无默认下划线
+    expect(a.classes()).toContain('text-slate-600')
+    expect(a.classes()).not.toContain('underline')
 
     proj.items[0].link = 'javascript:alert(1)'
     const evil = mount(getTemplate('classic').component, { props: { resume } })

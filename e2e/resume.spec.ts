@@ -71,3 +71,39 @@ test('项目经历填写项目地址后出现在预览', async ({ page }) => {
   await expect(page.locator('main .resume-sheet')).toContainText('项目地址：')
   await expect(page.locator('main .resume-sheet a[href="https://github.com/test/campus-market"]')).toBeVisible()
 })
+
+test('选中文字调字号与加粗应用到预览', async ({ page }) => {
+  await page.goto('/editor')
+  const editable = page.locator('.rich-input').first()
+
+  // 选中首个文本节点的前 4 个字符，调字号 20px
+  await editable.evaluate((el) => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+    const node = walker.nextNode() as Text
+    const range = document.createRange()
+    range.setStart(node, 0)
+    range.setEnd(node, 4)
+    const sel = window.getSelection()!
+    sel.removeAllRanges()
+    sel.addRange(range)
+  })
+  await page.getByTestId('rich-size').first().selectOption('20')
+  const sized = page.locator('main .resume-sheet .resume-content span[style*="font-size: 20px"]').first()
+  await expect(sized).toBeVisible()
+  expect((await sized.textContent())?.length).toBe(4)
+
+  // 选中下一段文本加粗
+  await editable.evaluate((el) => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+    walker.nextNode()
+    const node = walker.nextNode() as Text
+    const range = document.createRange()
+    range.setStart(node, 0)
+    range.setEnd(node, Math.min(4, node.length))
+    const sel = window.getSelection()!
+    sel.removeAllRanges()
+    sel.addRange(range)
+  })
+  await page.getByTitle('加粗（选中文字）').first().click()
+  await expect(page.locator('main .resume-sheet .resume-content b, main .resume-sheet .resume-content strong').first()).toBeVisible()
+})
