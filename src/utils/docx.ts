@@ -118,7 +118,7 @@ export async function buildResumeDocx(resume: Resume): Promise<Blob> {
     })
   const para = (
     children: TextRun[],
-    opts: { align?: AlignmentType; bullet?: boolean; after?: number } = {}
+    opts: { align?: (typeof AlignmentType)[keyof typeof AlignmentType]; bullet?: boolean; after?: number } = {}
   ) =>
     new Paragraph({
       children,

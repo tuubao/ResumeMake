@@ -45,14 +45,14 @@ test('导出 JPG 与 Word 文件下载', async ({ page }) => {
   await page.getByTestId('export-menu').click()
   const [jpg] = await Promise.all([page.waitForEvent('download'), page.getByTestId('export-jpg').click()])
   expect(jpg.suggestedFilename()).toMatch(/\.jpg$/)
-  const jpgPath = await jpg.path()
-  expect(fs.statSync(jpgPath!).size).toBeGreaterThan(20000)
+  await jpg.saveAs('docs/sample.jpg')
+  expect(fs.statSync('docs/sample.jpg').size).toBeGreaterThan(20000)
 
   await page.getByTestId('export-menu').click()
   const [docx] = await Promise.all([page.waitForEvent('download'), page.getByTestId('export-docx').click()])
   expect(docx.suggestedFilename()).toMatch(/\.docx$/)
-  const docxPath = await docx.path()
-  expect(fs.statSync(docxPath!).size).toBeGreaterThan(1000)
+  await docx.saveAs('docs/sample.docx')
+  expect(fs.statSync('docs/sample.docx').size).toBeGreaterThan(1000)
 })
 
 test('自定义信息与自定义模块出现在预览', async ({ page }) => {
