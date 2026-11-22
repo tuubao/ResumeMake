@@ -40,6 +40,20 @@ describe('BasicsForm', () => {
     await wrapper.find('[data-field="name"]').setValue('李四')
     expect(store.resume.basics.name).toBe('李四')
   })
+
+  it('自定义信息增删改', async () => {
+    const store = useResumeStore()
+    const wrapper = mount(BasicsForm)
+    const before = store.resume.basics.customFields.length
+    await wrapper.find('[data-testid="add-custom-field"]').trigger('click')
+    expect(store.resume.basics.customFields.length).toBe(before + 1)
+    const inputs = wrapper.findAll('[data-field="custom-value"]')
+    await inputs[inputs.length - 1].setValue('英语 CET-6')
+    expect(store.resume.basics.customFields[before].value).toBe('英语 CET-6')
+    const removes = wrapper.findAll('[data-testid="remove-custom-field"]')
+    await removes[removes.length - 1].trigger('click')
+    expect(store.resume.basics.customFields.length).toBe(before)
+  })
 })
 
 describe('StylePanel', () => {
@@ -48,6 +62,8 @@ describe('StylePanel', () => {
     const wrapper = mount(StylePanel)
     await wrapper.find('[data-field="fontSize"]').setValue('16')
     expect(store.resume.style.fontSize).toBe(16)
+    await wrapper.find('[data-field="nameSize"]').setValue('32')
+    expect(store.resume.style.nameSize).toBe(32)
     await wrapper.find('[data-testid="swatch-#0d9488"]').trigger('click')
     expect(store.resume.style.themeColor).toBe('#0d9488')
   })
@@ -84,6 +100,15 @@ describe('ModuleEditor / ItemEditor', () => {
     const wrapper = mount(ItemEditor, { props: { moduleId: edu.id, item: edu.items[0], type: edu.type } })
     await wrapper.find('[data-field="item-title"]').setValue('清华大学')
     expect(edu.items[0].title).toBe('清华大学')
+  })
+
+  it('自定义模块条目显示标题字段', () => {
+    const store = useResumeStore()
+    store.addModule('custom')
+    const m = store.resume.modules.find((x) => x.type === 'custom')!
+    const wrapper = mount(ItemEditor, { props: { moduleId: m.id, item: m.items[0], type: m.type } })
+    expect(wrapper.text()).toContain('标题')
+    expect(wrapper.find('[data-field="item-title"]').exists()).toBe(true)
   })
 })
 

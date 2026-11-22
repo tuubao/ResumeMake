@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
-import type { ModuleItem, ModuleType, Resume, ResumeBasics, ResumeModule, ResumeStyle } from '@/types/resume'
+import type { CustomField, ModuleItem, ModuleType, Resume, ResumeBasics, ResumeModule, ResumeStyle } from '@/types/resume'
 import { MODULE_TYPE_LABELS, createItem, uid } from '@/types/resume'
 import { createSampleResume } from '@/data/sampleResume'
 import { loadResume, saveResume } from '@/utils/storage'
@@ -67,6 +67,19 @@ export const useResumeStore = defineStore('resume', () => {
     resume.value = createSampleResume()
   }
 
+  function addCustomField() {
+    resume.value.basics.customFields.push({ id: uid(), icon: 'user', value: '' })
+  }
+
+  function removeCustomField(id: string) {
+    resume.value.basics.customFields = resume.value.basics.customFields.filter((f) => f.id !== id)
+  }
+
+  function updateCustomField(id: string, patch: Partial<Omit<CustomField, 'id'>>) {
+    const f = resume.value.basics.customFields.find((x) => x.id === id)
+    if (f) Object.assign(f, patch)
+  }
+
   return {
     resume,
     setTemplate,
@@ -78,6 +91,9 @@ export const useResumeStore = defineStore('resume', () => {
     addItem,
     removeItem,
     updateItem,
-    resetToSample
+    resetToSample,
+    addCustomField,
+    removeCustomField,
+    updateCustomField
   }
 })

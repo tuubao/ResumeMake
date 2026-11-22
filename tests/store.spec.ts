@@ -71,6 +71,28 @@ describe('resume store', () => {
     expect(store.resume.basics.name).toBe('张三')
   })
 
+  it('自定义信息字段增删改', () => {
+    const store = useResumeStore()
+    const before = store.resume.basics.customFields.length
+    store.addCustomField()
+    expect(store.resume.basics.customFields.length).toBe(before + 1)
+    const f = store.resume.basics.customFields[store.resume.basics.customFields.length - 1]
+    store.updateCustomField(f.id, { value: 'GitHub: github.com/zhangsan', icon: 'link' })
+    expect(f.value).toBe('GitHub: github.com/zhangsan')
+    expect(f.icon).toBe('link')
+    store.removeCustomField(f.id)
+    expect(store.resume.basics.customFields.length).toBe(before)
+  })
+
+  it('自定义模块可添加并重命名', () => {
+    const store = useResumeStore()
+    store.addModule('custom')
+    const m = store.resume.modules.find((x) => x.type === 'custom')!
+    expect(m.title).toBe('自定义模块')
+    store.updateModule(m.id, { title: '开源贡献' })
+    expect(store.resume.modules.find((x) => x.id === m.id)!.title).toBe('开源贡献')
+  })
+
   describe('防抖自动保存', () => {
     beforeEach(() => vi.useFakeTimers())
     afterEach(() => vi.useRealTimers())

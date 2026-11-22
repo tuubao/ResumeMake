@@ -1,4 +1,5 @@
 import type { Resume } from '@/types/resume'
+import { normalizeResume } from '@/types/resume'
 
 const STORAGE_KEY = 'resumemake:resume'
 
@@ -35,7 +36,7 @@ export function loadResume(): Resume | null {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const parsed: unknown = JSON.parse(raw)
-    return isValidResume(parsed) ? parsed : null
+    return isValidResume(parsed) ? normalizeResume(parsed) : null
   } catch {
     return null
   }

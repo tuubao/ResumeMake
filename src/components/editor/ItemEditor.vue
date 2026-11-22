@@ -7,7 +7,7 @@ import RichText from './RichText.vue'
 const props = defineProps<{ moduleId: string; item: ModuleItem; type: ModuleType }>()
 const store = useResumeStore()
 
-const hasHeader = computed(() => ['education', 'work', 'projects'].includes(props.type))
+const hasHeader = computed(() => ['education', 'work', 'projects', 'custom'].includes(props.type))
 const labels = computed(() => {
   switch (props.type) {
     case 'education':
@@ -16,6 +16,8 @@ const labels = computed(() => {
       return { title: '公司', subtitle: '职位', content: '工作内容与成果' }
     case 'projects':
       return { title: '项目名称', subtitle: '担任角色', content: '项目描述 / 技术栈 / 亮点' }
+    case 'custom':
+      return { title: '标题', subtitle: '副标题（可选）', content: '内容' }
     default:
       return { title: '', subtitle: '', content: '内容' }
   }

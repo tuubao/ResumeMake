@@ -4,8 +4,10 @@ import { useResumeStore } from '@/stores/resume'
 const store = useResumeStore()
 
 const FONTS = [
-  { label: '雅黑 / 黑体', value: '"Microsoft YaHei", "PingFang SC", sans-serif' },
-  { label: '宋体 / 衬线', value: '"SimSun", "Songti SC", serif' },
+  { label: '微软雅黑（互联网推荐）', value: '"Microsoft YaHei", "PingFang SC", sans-serif' },
+  { label: '思源黑体 / Noto Sans', value: '"Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif' },
+  { label: '等线', value: '"DengXian", "Microsoft YaHei", sans-serif' },
+  { label: '宋体（传统行业）', value: '"SimSun", "Songti SC", serif' },
   { label: '楷体', value: '"KaiTi", "Kaiti SC", serif' }
 ]
 const COLORS = ['#2563eb', '#0d9488', '#111827', '#b91c1c', '#15803d', '#ea580c']
@@ -25,6 +27,11 @@ const COLORS = ['#2563eb', '#0d9488', '#111827', '#b91c1c', '#15803d', '#ea580c'
       <label class="block text-xs text-slate-500">
         正文字号：{{ store.resume.style.fontSize }}px
         <input v-model.number="store.resume.style.fontSize" data-field="fontSize" type="range" min="12" max="18" step="1" class="w-full accent-teal-600" />
+      </label>
+
+      <label class="block text-xs text-slate-500">
+        姓名字号：{{ store.resume.style.nameSize }}px
+        <input v-model.number="store.resume.style.nameSize" data-field="nameSize" type="range" min="20" max="36" step="1" class="w-full accent-teal-600" />
       </label>
 
       <div class="text-xs text-slate-500">
@@ -54,13 +61,14 @@ const COLORS = ['#2563eb', '#0d9488', '#111827', '#b91c1c', '#15803d', '#ea580c'
 
       <label class="block text-xs text-slate-500">
         行距：{{ store.resume.style.lineHeight.toFixed(1) }}
-        <input v-model.number="store.resume.style.lineHeight" data-field="lineHeight" type="range" min="1.4" max="2" step="0.1" class="w-full accent-teal-600" />
+        <input v-model.number="store.resume.style.lineHeight" data-field="lineHeight" type="range" min="1.2" max="1.8" step="0.1" class="w-full accent-teal-600" />
       </label>
 
       <label class="block text-xs text-slate-500">
         页边距：{{ store.resume.style.pageMargin }}mm
         <input v-model.number="store.resume.style.pageMargin" data-field="pageMargin" type="range" min="10" max="25" step="1" class="w-full accent-teal-600" />
       </label>
+      <p class="text-[11px] leading-4 text-slate-400">IT 岗排版参考：雅黑/思源黑体，正文 14–16px，姓名 21–32px，行距 1.2–1.5，全文不超过 2 种字体。</p>
     </div>
   </section>
 </template>

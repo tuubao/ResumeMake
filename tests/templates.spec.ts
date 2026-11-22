@@ -45,6 +45,21 @@ describe('模板渲染', () => {
     expect(getTemplate('not-exist').id).toBe(TEMPLATES[0].id)
   })
 
+  it('头部：图标信息行渲染自定义信息，无头像不占位', () => {
+    const resume = createSampleResume()
+    const wrapper = mount(getTemplate('classic').component, { props: { resume } })
+    expect(wrapper.find('img[alt="头像"]').exists()).toBe(false)
+    expect(wrapper.findAll('header svg').length).toBeGreaterThanOrEqual(4)
+    expect(wrapper.text()).toContain('某某大学 · 本科 · 2026 届')
+  })
+
+  it('姓名字号独立可调', () => {
+    const resume = createSampleResume()
+    resume.style.nameSize = 32
+    const wrapper = mount(getTemplate('modern').component, { props: { resume } })
+    expect(wrapper.find('h1').attributes('style')).toContain('font-size: 32px')
+  })
+
   it('ResumeSheet 应用页边距并渲染对应模板', () => {
     const resume = createSampleResume()
     resume.style.pageMargin = 20

@@ -11,7 +11,8 @@ export function createSampleResume(): Resume {
       email: 'zhangsan@example.com',
       jobTitle: 'Java后端开发工程师',
       avatar: '',
-      extra: '应届生 · 南昌'
+      extra: '应届生 · 南昌',
+      customFields: [{ id: uid(), icon: 'education', value: '某某大学 · 本科 · 2026 届' }]
     },
     modules: [
       {

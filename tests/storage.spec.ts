@@ -38,4 +38,14 @@ describe('storage 持久化', () => {
     delete bad.modules
     expect(isValidResume(bad)).toBe(false)
   })
+
+  it('旧版存档自动补齐新字段', () => {
+    const legacy = createSampleResume() as unknown as { basics: Record<string, unknown>; style: Record<string, unknown> }
+    delete legacy.basics.customFields
+    delete legacy.style.nameSize
+    localStorage.setItem('resumemake:resume', JSON.stringify(legacy))
+    const loaded = loadResume()!
+    expect(loaded.basics.customFields).toEqual([])
+    expect(loaded.style.nameSize).toBe(26)
+  })
 })
