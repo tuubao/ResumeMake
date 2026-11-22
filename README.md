@@ -21,6 +21,8 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
+> 执行完上述指令后，就可以打开浏览器访问 http://localhost:5173 了。接下来请制作你的简历吧！！！
+
 ## 常用命令
 
 | 命令 | 说明 |
