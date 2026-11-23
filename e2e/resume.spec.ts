@@ -133,3 +133,61 @@ test('选中文字调字号与加粗应用到预览', async ({ page }) => {
   await page.getByTitle('加粗（选中文字）').first().click()
   await expect(page.locator('main .resume-sheet .resume-content b, main .resume-sheet .resume-content strong').first()).toBeVisible()
 })
+
+test('模板中心：12 套场景模板与岗位标签', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('[data-testid^="template-card-"]')).toHaveCount(12)
+  await expect(page.getByTestId('template-card-banner')).toContainText('硕士')
+  await expect(page.getByTestId('template-card-sidebar')).toContainText('高级')
+  await expect(page.getByTestId('template-card-ops-campus')).toContainText('运营')
+  // 每张卡片提供「使用此模板」与「使用示例内容」两个入口
+  await expect(page.getByTestId('use-template-banner')).toBeVisible()
+  await expect(page.getByTestId('use-sample-banner')).toBeVisible()
+})
+
+test('使用示例内容：载入场景示例进入编辑器，换模板不丢数据', async ({ page }) => {
+  await page.goto('/')
+  page.once('dialog', (d) => d.accept())
+  await page.getByTestId('use-sample-banner').click()
+  await expect(page).toHaveURL(/\/editor/)
+  const sheet = page.locator('main .resume-sheet')
+  await expect(sheet).toContainText('短视频内容管理中台')
+  await expect(sheet).toContainText('硕士')
+  await expect(sheet).toContainText('实习经历')
+
+  // 编辑器内切换模板仅改外观，示例内容不丢
+  await page.locator('[data-field="template"]').selectOption('sidebar')
+  await expect(sheet).toContainText('短视频内容管理中台')
+  await expect(sheet.locator('aside')).toContainText('专业技能')
+})
+
+test('使用示例内容：取消确认保留当前内容', async ({ page }) => {
+  await page.goto('/editor')
+  await page.locator('[data-field="name"]').fill('保留用户')
+  await page.waitForTimeout(700)
+  await page.goto('/')
+  page.once('dialog', (d) => d.dismiss())
+  await page.getByTestId('use-sample-sidebar').click()
+  await expect(page).not.toHaveURL(/\/editor/)
+  await page.goto('/editor')
+  await expect(page.locator('[data-field="name"]')).toHaveValue('保留用户')
+})
+
+test('新视觉模板在预览中正确渲染（双栏/时光轴/横幅）', async ({ page }) => {
+  await page.goto('/editor')
+  const sheet = page.locator('main .resume-sheet')
+
+  // 商务双栏：侧栏技能信息，主栏姓名
+  await page.locator('[data-field="template"]').selectOption('sidebar')
+  await expect(sheet.locator('aside')).toContainText('专业技能')
+  await expect(sheet.locator('h1')).toContainText('张三')
+
+  // 时光轴：经历模块带类型装饰类
+  await page.locator('[data-field="template"]').selectOption('timeline')
+  await expect(sheet.locator('.module-work')).toHaveCount(1)
+  await expect(sheet.locator('.module-projects')).toHaveCount(1)
+
+  // 色块横幅：头部背景色跟随主题色（第一个 header 为横幅头部，其余为条目标题头）
+  await page.locator('[data-field="template"]').selectOption('banner')
+  await expect(sheet.locator('header').first()).toHaveCSS('background-color', 'rgb(37, 99, 235)')
+})
