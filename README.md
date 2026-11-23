@@ -49,4 +49,4 @@ Vue 3 + TypeScript + Vite + TailwindCSS v4 + Pinia + Vue Router；测试 Vitest 
 - 数据仅保存在浏览器本地，清浏览器数据会丢失简历，重要内容请及时导出
 - PDF 导出推荐 Chrome / Edge：点击「导出 → PDF」后在打印对话框选择「另存为 PDF」，边距选「无」、勾选「背景图形」
 - JPG 为整份简历的单张长图（2x 分辨率）；Word 为真正的 .docx，可在 Word / WPS 中继续编辑
-- 导出样例见 `docs/sample.jpg`、`docs/sample.docx`、`docs/preview.pdf`（由 E2E 与脚本生成）
+- 导出样例见 `docs/sample.jpg`、`docs/sample.docx`、`docs/preview.pdf`，这些样例仅供参考
