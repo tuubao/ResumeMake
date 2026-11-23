@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { TEMPLATES, getTemplate } from '@/templates'
 import ResumeSheet from '@/components/ResumeSheet.vue'
 import { createSampleResume } from '@/data/sampleResume'
+import { TEMPLATE_SAMPLES } from '@/data/samples'
 
 describe('模板渲染', () => {
   for (const tpl of TEMPLATES) {
@@ -103,5 +104,82 @@ describe('模板渲染', () => {
     const evil = mount(getTemplate('classic').component, { props: { resume } })
     expect(evil.find('a').exists()).toBe(false)
     expect(evil.text()).toContain('javascript:alert(1)')
+  })
+})
+
+describe('模板库扩展（12 套场景模板）', () => {
+  it('12 套模板均注册标签与场景示例，id 唯一', () => {
+    expect(TEMPLATES.length).toBe(12)
+    expect(new Set(TEMPLATES.map((t) => t.id)).size).toBe(12)
+    for (const t of TEMPLATES) {
+      expect(t.tags.length).toBeGreaterThan(0)
+      expect(t.sample().templateId).toBe(t.id)
+    }
+    expect(Object.keys(TEMPLATE_SAMPLES).sort()).toEqual(TEMPLATES.map((t) => t.id).sort())
+  })
+
+  for (const tpl of TEMPLATES) {
+    it(`${tpl.name}：渲染自带场景示例的全部模块`, () => {
+      const resume = tpl.sample()
+      const wrapper = mount(tpl.component, { props: { resume } })
+      const text = wrapper.text()
+      expect(text).toContain(resume.basics.name)
+      expect(text).toContain(resume.basics.jobTitle)
+      for (const m of resume.modules) {
+        expect(text).toContain(m.title)
+      }
+      expect(wrapper.findAll('.resume-module').length).toBe(resume.modules.length)
+    })
+  }
+
+  it('色块横幅：头部渲染联系方式与头像，字段覆盖生效', () => {
+    const resume = TEMPLATE_SAMPLES.banner()
+    resume.basics.avatar = 'data:image/png;base64,AAAA'
+    resume.basics.styles = { name: { size: 30, bold: false } }
+    const wrapper = mount(getTemplate('banner').component, { props: { resume } })
+    const h1 = wrapper.find('h1')
+    expect(h1.attributes('style')).toContain('font-size: 30px')
+    expect(h1.attributes('style')).toContain('font-weight: 400')
+    expect(wrapper.find('img[alt="头像"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('138-0000-8888')
+    expect(wrapper.find('header').attributes('style')).toContain('background-color')
+  })
+
+  it('商务双栏：侧栏渲染技能/教育/自评与联系方式，主栏渲染姓名/工作/项目', () => {
+    const resume = TEMPLATE_SAMPLES.sidebar()
+    const wrapper = mount(getTemplate('sidebar').component, { props: { resume } })
+    const aside = wrapper.find('aside')
+    expect(aside.text()).toContain('专业技能')
+    expect(aside.text()).toContain('教育背景')
+    expect(aside.text()).toContain('自我评价')
+    expect(aside.text()).toContain('138-0000-8888')
+    expect(aside.text()).not.toContain('工作经历')
+    const main = wrapper.find('aside + div')
+    expect(main.text()).toContain('工作经历')
+    expect(main.text()).toContain('项目经历')
+    expect(main.find('h1').text()).toBe('张三')
+  })
+
+  it('时光轴：经历模块带类型装饰类与主题色变量', () => {
+    const resume = TEMPLATE_SAMPLES.timeline()
+    const wrapper = mount(getTemplate('timeline').component, { props: { resume } })
+    expect(wrapper.find('.module-work').exists()).toBe(true)
+    expect(wrapper.find('.module-projects').exists()).toBe(true)
+    expect(wrapper.attributes('style')).toContain('--tl-theme')
+  })
+
+  it('清新分区：每个模块包裹色块容器', () => {
+    const resume = TEMPLATE_SAMPLES.fresh()
+    const wrapper = mount(getTemplate('fresh').component, { props: { resume } })
+    expect(wrapper.findAll('.fresh-block').length).toBe(resume.modules.length)
+  })
+
+  it('新模板字段级覆盖与项目链接渲染', () => {
+    const resume = TEMPLATE_SAMPLES.fresh()
+    resume.modules[0].titleStyle = { size: 20 }
+    const wrapper = mount(getTemplate('fresh').component, { props: { resume } })
+    expect(wrapper.find('.resume-module h2').attributes('style')).toContain('font-size: 20px')
+    const proj = resume.modules.find((m) => m.type === 'projects')!
+    expect(wrapper.find(`a[href="${proj.items[0].link}"]`).exists()).toBe(true)
   })
 })

@@ -8,7 +8,7 @@ import { textStyleCss } from '@/utils/textStyle'
 const props = defineProps<{
   module: ResumeModule
   themeColor: string
-  variant: 'bar' | 'underline' | 'plain'
+  variant: 'bar' | 'underline' | 'plain' | 'chip' | 'dot'
 }>()
 
 const isList = computed(() => props.module.type === 'skills')
@@ -22,7 +22,7 @@ const safeHref = (url?: string) => {
 </script>
 
 <template>
-  <section class="resume-module mt-4">
+  <section class="resume-module mt-4" :class="'module-' + module.type">
     <h2
       v-if="variant === 'bar'"
       class="mb-2 border-l-4 pl-2 text-[1.1em] font-bold text-slate-900"
@@ -35,6 +35,21 @@ const safeHref = (url?: string) => {
       class="mb-2 border-b-2 pb-1 text-[1.1em] font-bold"
       :style="{ borderColor: themeColor, color: themeColor, ...textStyleCss(module.titleStyle) }"
     >
+      {{ module.title }}
+    </h2>
+    <h2
+      v-else-if="variant === 'chip'"
+      class="mb-2 inline-block rounded px-2.5 py-0.5 text-[1.05em] font-bold text-white"
+      :style="{ backgroundColor: themeColor, ...textStyleCss(module.titleStyle) }"
+    >
+      {{ module.title }}
+    </h2>
+    <h2
+      v-else-if="variant === 'dot'"
+      class="mb-2 flex items-center gap-2 text-[1.1em] font-bold text-slate-900"
+      :style="textStyleCss(module.titleStyle)"
+    >
+      <span class="inline-block h-2 w-2 shrink-0 rounded-sm" :style="{ backgroundColor: themeColor }"></span>
       {{ module.title }}
     </h2>
     <h2 v-else class="mb-2 border-b border-slate-300 pb-1 text-[1.1em] font-bold text-slate-900" :style="textStyleCss(module.titleStyle)">

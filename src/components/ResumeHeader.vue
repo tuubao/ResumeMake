@@ -4,7 +4,7 @@ import type { HeaderIcon, Resume, TextStyle } from '@/types/resume'
 import { HEADER_ICONS } from '@/utils/icons'
 import { textStyleCss } from '@/utils/textStyle'
 
-const props = defineProps<{ resume: Resume }>()
+const props = withDefaults(defineProps<{ resume: Resume; align?: 'center' | 'left' }>(), { align: 'center' })
 
 type RowItem = { icon: HeaderIcon; value: string; style?: TextStyle }
 
@@ -27,7 +27,7 @@ const row3 = computed<RowItem[]>(() =>
 </script>
 
 <template>
-  <header class="relative mb-3 text-center">
+  <header class="relative mb-3" :class="align === 'left' ? 'text-left' : 'text-center'">
     <!-- 头像未上传时留空，不占位 -->
     <img
       v-if="resume.basics.avatar"
@@ -44,7 +44,8 @@ const row3 = computed<RowItem[]>(() =>
     <template v-for="(row, ri) in [row2, row3]" :key="ri">
       <div
         v-if="row.length"
-        class="mt-1.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[0.9em] text-slate-600"
+        class="mt-1.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-[0.9em] text-slate-600"
+        :class="align === 'left' ? 'justify-start' : 'justify-center'"
       >
         <span v-for="(it, i) in row" :key="i" class="inline-flex items-center gap-1.5">
           <svg
