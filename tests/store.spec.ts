@@ -4,6 +4,7 @@ import { nextTick } from 'vue'
 import { useResumeStore } from '@/stores/resume'
 import { saveResume, loadResume } from '@/utils/storage'
 import { createSampleResume } from '@/data/sampleResume'
+import { TEMPLATE_SAMPLES } from '@/data/samples'
 
 describe('resume store', () => {
   beforeEach(() => {
@@ -70,6 +71,16 @@ describe('resume store', () => {
     store.updateBasics({ name: '王五' })
     store.resetToSample()
     expect(store.resume.basics.name).toBe('张三')
+  })
+
+  it('applyResume 载入完整场景示例并整体替换数据', () => {
+    const store = useResumeStore()
+    const sample = TEMPLATE_SAMPLES.banner()
+    store.applyResume(sample)
+    expect(store.resume.templateId).toBe('banner')
+    expect(store.resume.basics.jobTitle).toBe(sample.basics.jobTitle)
+    expect(store.resume.modules.length).toBe(sample.modules.length)
+    expect(store.resume).toEqual(sample)
   })
 
   it('自定义信息字段增删改', () => {

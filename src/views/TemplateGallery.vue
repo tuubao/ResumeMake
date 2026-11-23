@@ -3,7 +3,6 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { TEMPLATES } from '@/templates'
 import { useResumeStore } from '@/stores/resume'
-import { createSampleResume } from '@/data/sampleResume'
 import ResumeSheet from '@/components/ResumeSheet.vue'
 
 const router = useRouter()
@@ -15,19 +14,25 @@ const filtered = computed(() =>
   active.value === '全部' ? TEMPLATES : TEMPLATES.filter((t) => t.category === active.value)
 )
 
-/** 缩略图使用独立示例数据，不影响用户简历 */
-const previews = TEMPLATES.map((t) => {
-  const r = createSampleResume()
-  r.templateId = t.id
-  return r
-})
+/** 缩略图使用各模板自带的完整场景示例，不影响用户简历 */
+const previews = TEMPLATES.map((t) => t.sample())
 const previewFor = (id: string) => previews.find((p) => p.templateId === id)!
 
 const THUMB_W = 300
 const SCALE = THUMB_W / 794
 
+/** 一键套用：仅切换模板外观，用户内容不动（既有行为） */
 function useTemplate(id: string) {
   store.setTemplate(id)
+  router.push('/editor')
+}
+
+/** 使用示例内容：显式确认后载入该模板的完整场景示例 */
+function useSample(id: string) {
+  const tpl = TEMPLATES.find((t) => t.id === id)
+  if (!tpl) return
+  if (!window.confirm('将载入该模板的完整示例内容，当前简历内容会被覆盖，确定继续？')) return
+  store.applyResume(tpl.sample())
   router.push('/editor')
 }
 </script>
@@ -76,15 +81,28 @@ function useTemplate(id: string) {
             <h2 class="font-bold text-slate-900">{{ t.name }}</h2>
             <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-500">{{ t.category }}</span>
           </div>
+          <div class="mt-1.5 flex flex-wrap gap-1">
+            <span v-for="tag in t.tags" :key="tag" class="rounded bg-teal-50 px-1.5 py-0.5 text-[10px] text-teal-700">{{ tag }}</span>
+          </div>
           <p class="mt-1 text-xs leading-5 text-slate-500">{{ t.description }}</p>
-          <button
-            type="button"
-            :data-testid="`use-template-${t.id}`"
-            class="mt-3 w-full rounded-xl bg-teal-600 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-500"
-            @click="useTemplate(t.id)"
-          >
-            使用此模板
-          </button>
+          <div class="mt-3 flex gap-2">
+            <button
+              type="button"
+              :data-testid="`use-template-${t.id}`"
+              class="flex-1 rounded-xl bg-teal-600 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-500"
+              @click="useTemplate(t.id)"
+            >
+              使用此模板
+            </button>
+            <button
+              type="button"
+              :data-testid="`use-sample-${t.id}`"
+              class="flex-1 rounded-xl border border-teal-600 py-2 text-sm font-medium text-teal-700 transition-colors hover:bg-teal-50"
+              @click="useSample(t.id)"
+            >
+              使用示例内容
+            </button>
+          </div>
         </div>
       </article>
     </div>

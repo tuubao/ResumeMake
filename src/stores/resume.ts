@@ -75,6 +75,11 @@ export const useResumeStore = defineStore('resume', () => {
     resume.value = createSampleResume()
   }
 
+  /** 载入一份完整简历（如模板自带场景示例），整体替换数据 */
+  function applyResume(r: Resume) {
+    resume.value = r
+  }
+
   function addCustomField() {
     resume.value.basics.customFields.push({ id: uid(), icon: 'user', value: '' })
   }
@@ -101,6 +106,7 @@ export const useResumeStore = defineStore('resume', () => {
     removeItem,
     updateItem,
     resetToSample,
+    applyResume,
     addCustomField,
     removeCustomField,
     updateCustomField
