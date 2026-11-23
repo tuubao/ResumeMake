@@ -38,7 +38,8 @@ describe('resume store', () => {
     const count = store.resume.modules.length
     store.addModule('work')
     expect(store.resume.modules.length).toBe(count + 1)
-    const work = store.resume.modules.find((m) => m.type === 'work')!
+    // 默认示例已含「实习经历」work 模块，取新增的最后一个
+    const work = store.resume.modules.filter((m) => m.type === 'work').at(-1)!
     expect(work.title).toBe('工作经历')
     expect(work.items.length).toBe(1)
 
